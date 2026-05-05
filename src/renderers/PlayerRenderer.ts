@@ -22,7 +22,7 @@ export class PlayerRenderer {
 
     // 스프라이트 생성
     this.sprite = scene.add.sprite(initialState.x, initialState.y, 'soldier_idle')
-    this.sprite.setScale(0.7) // 100x100 → 70x70
+    this.sprite.setScale(2) // 100x100 → 70x70
     this.sprite.play('soldier_idle')
 
     // 로컬 플레이어는 파란 틴트, 다른 플레이어는 붉은 틴트
