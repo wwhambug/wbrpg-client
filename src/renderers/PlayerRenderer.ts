@@ -1,17 +1,15 @@
 import Phaser from 'phaser'
 import { PlayerState } from '@network/ColyseusClient'
 
-// 플레이어 한 명의 시각적 표현 담당
-// 연산 없음 - 서버 상태를 받아서 위치/애니메이션만 업데이트
 export class PlayerRenderer {
-  private sprite: Phaser.GameObjects.Rectangle // 임시: 실제 스프라이트로 교체 예정
-  private nameLabel: Phaser.GameObjects.Text
-  private hpBar: Phaser.GameObjects.Rectangle
-  private hpBarBg: Phaser.GameObjects.Rectangle
+  private sprite!: Phaser.GameObjects.Sprite
+  private nameLabel!: Phaser.GameObjects.Text
+  private hpBar!: Phaser.GameObjects.Rectangle
+  private hpBarBg!: Phaser.GameObjects.Rectangle
 
-  // 보간용 목표 좌표 (서버 상태와 렌더 위치 사이 부드럽게 이동)
   private targetX: number
   private targetY: number
+  private facingLeft = false
 
   constructor(
     private scene: Phaser.Scene,
@@ -22,51 +20,83 @@ export class PlayerRenderer {
     this.targetX = initialState.x
     this.targetY = initialState.y
 
-    // ── 임시 플레이어 시각화 (스프라이트 에셋 생기면 교체) ──
-    this.sprite = scene.add.rectangle(
-      initialState.x,
-      initialState.y,
-      28, 28,
-      isLocalPlayer ? 0x88aaff : 0xff8866
-    )
+    // 스프라이트 생성
+    this.sprite = scene.add.sprite(initialState.x, initialState.y, 'soldier_idle')
+    this.sprite.setScale(0.7) // 100x100 → 70x70
+    this.sprite.play('soldier_idle')
 
-    // HP바 배경
-    this.hpBarBg = scene.add.rectangle(initialState.x, initialState.y - 24, 32, 5, 0x333333)
+    // 로컬 플레이어는 파란 틴트, 다른 플레이어는 붉은 틴트
+    if (!isLocalPlayer) {
+      this.sprite.setTint(0xff9999)
+    }
+
     // HP바
-    this.hpBar = scene.add.rectangle(initialState.x - 16, initialState.y - 24, 32, 5, 0x44ff88)
+    this.hpBarBg = scene.add.rectangle(initialState.x, initialState.y - 44, 50, 5, 0x333333)
+    this.hpBar   = scene.add.rectangle(initialState.x - 25, initialState.y - 44, 50, 5, 0x44ff88)
     this.hpBar.setOrigin(0, 0.5)
 
     // 이름 라벨
-    this.nameLabel = scene.add.text(initialState.x, initialState.y - 34, playerId.slice(0, 8), {
+    this.nameLabel = scene.add.text(initialState.x, initialState.y - 54, playerId.slice(0, 8), {
       fontSize: '10px',
-      color: '#ffffff',
+      color: isLocalPlayer ? '#aaddff' : '#ffaaaa',
       fontFamily: 'monospace',
     }).setOrigin(0.5)
-    // ────────────────────────────────────────────────────────
   }
 
-  // GameScene update()에서 매 프레임 호출
   update(delta: number): void {
-    // 선형 보간으로 부드러운 이동 (서버 틱레이트와 렌더 프레임 분리)
     const lerpFactor = Math.min(1, delta * 0.015)
     this.sprite.x = Phaser.Math.Linear(this.sprite.x, this.targetX, lerpFactor)
     this.sprite.y = Phaser.Math.Linear(this.sprite.y, this.targetY, lerpFactor)
 
-    // HP바, 이름도 따라다님
-    this.hpBarBg.setPosition(this.sprite.x, this.sprite.y - 24)
-    this.hpBar.setPosition(this.sprite.x - 16, this.sprite.y - 24)
-    this.nameLabel.setPosition(this.sprite.x, this.sprite.y - 34)
+    this.hpBarBg.setPosition(this.sprite.x, this.sprite.y - 44)
+    this.hpBar.setPosition(this.sprite.x - 25, this.sprite.y - 44)
+    this.nameLabel.setPosition(this.sprite.x, this.sprite.y - 54)
   }
 
-  // 서버 상태 수신 시 호출
   applyState(state: PlayerState): void {
     this.targetX = state.x
     this.targetY = state.y
 
-    // HP바 너비 업데이트
+    // 좌우 플립
+    if (state.direction === 'left') {
+      this.sprite.setFlipX(true)
+      this.facingLeft = true
+    } else if (state.direction === 'right') {
+      this.sprite.setFlipX(false)
+      this.facingLeft = false
+    }
+
+    // 애니메이션 전환
+    if (state.isMoving) {
+      if (this.sprite.anims.currentAnim?.key !== 'soldier_walk_side') {
+        this.sprite.play('soldier_walk_side')
+      }
+    } else {
+      if (this.sprite.anims.currentAnim?.key !== 'soldier_idle') {
+        this.sprite.play('soldier_idle')
+      }
+    }
+
+    // HP바 업데이트
     const ratio = state.hp / state.maxHp
-    this.hpBar.width = 32 * ratio
+    this.hpBar.width = 50 * ratio
     this.hpBar.fillColor = ratio > 0.5 ? 0x44ff88 : ratio > 0.25 ? 0xffcc00 : 0xff4444
+  }
+
+  // 공격 애니메이션 재생 (외부에서 호출)
+  playAttack(type: 1 | 2 | 3 = 1): void {
+    this.sprite.play(`soldier_attack${type}`, true)
+    this.sprite.once('animationcomplete', () => {
+      this.sprite.play('soldier_idle')
+    })
+  }
+
+  // 피격 애니메이션
+  playHurt(): void {
+    this.sprite.play('soldier_hurt', true)
+    this.sprite.once('animationcomplete', () => {
+      this.sprite.play('soldier_idle')
+    })
   }
 
   destroy(): void {

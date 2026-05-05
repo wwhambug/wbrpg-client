@@ -6,35 +6,83 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // 로딩 진행바 UI
     this.createLoadingBar()
 
-    // ── 에셋 로드 목록 ──────────────────────────────────────
-    // 스프라이트시트: 캐릭터 (추후 실제 에셋으로 교체)
-    // this.load.spritesheet('player', 'assets/player.png', {
-    //   frameWidth: 32,
-    //   frameHeight: 32,
-    // })
-
-    // 타일맵
-    // this.load.tilemapTiledJSON('map_town', 'assets/maps/town.json')
-    // this.load.image('tiles_town', 'assets/tiles/town.png')
-
-    // UI 에셋
-    // this.load.image('ui_healthbar', 'assets/ui/healthbar.png')
-    // ───────────────────────────────────────────────────────
+    // 솔저 스프라이트시트 로드
+    const BASE = 'assets/characters/soldier/'
+    this.load.spritesheet('soldier_idle',    BASE + 'Soldier-Idle.png',    { frameWidth: 100, frameHeight: 100 })
+    this.load.spritesheet('soldier_walk',    BASE + 'Soldier-Walk.png',    { frameWidth: 100, frameHeight: 100 })
+    this.load.spritesheet('soldier_attack1', BASE + 'Soldier-Attack01.png',{ frameWidth: 100, frameHeight: 100 })
+    this.load.spritesheet('soldier_attack2', BASE + 'Soldier-Attack02.png',{ frameWidth: 100, frameHeight: 100 })
+    this.load.spritesheet('soldier_attack3', BASE + 'Soldier-Attack03.png',{ frameWidth: 100, frameHeight: 100 })
+    this.load.spritesheet('soldier_hurt',    BASE + 'Soldier-Hurt.png',    { frameWidth: 100, frameHeight: 100 })
+    this.load.spritesheet('soldier_death',   BASE + 'Soldier-Death.png',   { frameWidth: 100, frameHeight: 100 })
   }
 
   create(): void {
-    // 에셋 로드 완료 → 로그인 씬으로 전환
+    // 애니메이션 등록
+    this.createAnimations()
     this.scene.start('LoginScene')
+  }
+
+  private createAnimations(): void {
+    const anims = this.anims
+
+    anims.create({
+      key: 'soldier_idle',
+      frames: anims.generateFrameNumbers('soldier_idle', { start: 0, end: 5 }),
+      frameRate: 8,
+      repeat: -1,
+    })
+
+    anims.create({
+      key: 'soldier_walk_side',
+      frames: anims.generateFrameNumbers('soldier_walk', { start: 0, end: 7 }),
+      frameRate: 10,
+      repeat: -1,
+    })
+
+    anims.create({
+      key: 'soldier_attack1',
+      frames: anims.generateFrameNumbers('soldier_attack1', { start: 0, end: 5 }),
+      frameRate: 12,
+      repeat: 0,
+    })
+
+    anims.create({
+      key: 'soldier_attack2',
+      frames: anims.generateFrameNumbers('soldier_attack2', { start: 0, end: 5 }),
+      frameRate: 12,
+      repeat: 0,
+    })
+
+    anims.create({
+      key: 'soldier_attack3',
+      frames: anims.generateFrameNumbers('soldier_attack3', { start: 0, end: 8 }),
+      frameRate: 12,
+      repeat: 0,
+    })
+
+    anims.create({
+      key: 'soldier_hurt',
+      frames: anims.generateFrameNumbers('soldier_hurt', { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: 0,
+    })
+
+    anims.create({
+      key: 'soldier_death',
+      frames: anims.generateFrameNumbers('soldier_death', { start: 0, end: 3 }),
+      frameRate: 8,
+      repeat: 0,
+    })
   }
 
   private createLoadingBar(): void {
     const { width, height } = this.cameras.main
 
     const barBg = this.add.rectangle(width / 2, height / 2, 400, 20, 0x222244)
-    const bar = this.add.rectangle(width / 2 - 200, height / 2, 0, 16, 0x6688ff)
+    const bar   = this.add.rectangle(width / 2 - 200, height / 2, 0, 16, 0x6688ff)
     bar.setOrigin(0, 0.5)
 
     this.add.text(width / 2, height / 2 - 30, 'LOADING...', {
@@ -43,14 +91,7 @@ export class BootScene extends Phaser.Scene {
       fontFamily: 'monospace',
     }).setOrigin(0.5)
 
-    // 로딩 진행률 업데이트
-    this.load.on('progress', (value: number) => {
-      bar.width = 396 * value
-    })
-
-    this.load.on('complete', () => {
-      barBg.destroy()
-      bar.destroy()
-    })
+    this.load.on('progress', (value: number) => { bar.width = 396 * value })
+    this.load.on('complete', () => { barBg.destroy(); bar.destroy() })
   }
 }
