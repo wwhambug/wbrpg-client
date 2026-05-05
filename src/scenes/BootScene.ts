@@ -9,7 +9,7 @@ export class BootScene extends Phaser.Scene {
     this.createLoadingBar()
 
     // 솔저 스프라이트시트 로드
-    const BASE = 'assets/Characters(100x100)/Soldier/Soldier%20with%20shadows/'
+    const BASE = 'assets/soldier/'
     this.load.spritesheet('soldier_idle',    BASE + 'Soldier-Idle.png',    { frameWidth: 100, frameHeight: 100 })
     this.load.spritesheet('soldier_walk',    BASE + 'Soldier-Walk.png',    { frameWidth: 100, frameHeight: 100 })
     this.load.spritesheet('soldier_attack1', BASE + 'Soldier-Attack01.png',{ frameWidth: 100, frameHeight: 100 })
