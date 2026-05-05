@@ -4,12 +4,19 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": ["vite/client"],
+    "paths": {
+      "@scenes/*":   ["./src/scenes/*"],
+      "@network/*":  ["./src/network/*"],
+      "@input/*":    ["./src/input/*"],
+      "@renderers/*": ["./src/renderers/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

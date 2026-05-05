@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
+import path from 'path'
 
 export default defineConfig({
   base: '/wbrpg-client/',
   resolve: {
     alias: {
-      '@scenes':    '/src/scenes',
-      '@network':   '/src/network',
-      '@input':     '/src/input',
-      '@renderers': '/src/renderers',
+      '@scenes':    path.resolve(__dirname, 'src/scenes'),
+      '@network':   path.resolve(__dirname, 'src/network'),
+      '@input':     path.resolve(__dirname, 'src/input'),
+      '@renderers': path.resolve(__dirname, 'src/renderers'),
     }
   },
   server: {
