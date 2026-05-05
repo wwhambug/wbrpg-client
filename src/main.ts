@@ -32,8 +32,8 @@ const config: Phaser.Types.Core.GameConfig = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   render: {
-    antialias: false, // 픽셀아트 계열이면 false 유지
-    pixelArt: true,
+    antialias: true, // 픽셀아트 계열 이제 아님
+    pixelArt: false,
   }
 }
 
