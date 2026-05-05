@@ -36,8 +36,8 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: http://112.168.140.202:3000
-          VITE_WS_URL: ws://112.168.140.202:3000
+          VITE_API_URL: https://api.wwhambug.kro.kr
+          VITE_WS_URL: wss://api.wwhambug.kro.kr
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
