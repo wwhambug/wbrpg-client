@@ -9,14 +9,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": "./src",
-    "paths": {
-      "@scenes/*": ["scenes/*"],
-      "@network/*": ["network/*"],
-      "@input/*": ["input/*"],
-      "@renderers/*": ["renderers/*"]
-    }
+    "rootDir": "./src"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
